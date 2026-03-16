@@ -13,9 +13,15 @@ Route::get('/consultar', function () {
 
 Route::get('/insertar', function () {
     $user = new \App\Models\User();
-    $user->name = 'Kevin';
-    $user->email = 'kevin2098@example.com';
-    $user->password = '75571452g.';
+    $user->name = 'Otro EJ';
+    $user->email = 'otro@mail.com';
+    $user->password = 'mypassword';
     $user->save();
     return dd($user);
 });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.list');
