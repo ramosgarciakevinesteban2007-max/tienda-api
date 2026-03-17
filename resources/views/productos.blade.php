@@ -282,6 +282,7 @@
                             <div class="product-info">
                                 <h5>{{ $product->name }}</h5>
                                 <p><strong>ID:</strong> {{ $product->id }}</p>
+                                <p><strong>Precio:</strong> ${{ $product->price }}</p>
                             </div>
                             <button class="btn-add" onclick="agregarAlcarrito({{ json_encode($product) }})">
                                 ➕ Añadir al carrito
@@ -308,6 +309,10 @@
                             <span>Total de artículos:</span>
                             <span id="total-items">0</span>
                         </div>
+                        <div class="carrito-total">
+                            <span>Total a pagar:</span>
+                            <span id="total-price">$0</span>
+                        </div>
                         <button class="btn-checkout" id="btn-comprar" onclick="finalizarCompra()" disabled>
                             Finalizar Compra
                         </button>
@@ -319,8 +324,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let carrito = []
-
+        let carrito = JSON.parse(localStorage.getItem('carrito'))
+        carrito = carrito ? carrito : []
+        console.log("carrito:", carrito)
+        
         function agregarAlcarrito(product){
             let posicion = carrito.findIndex(item => item.id === product.id)
             if(posicion !== -1){
@@ -329,6 +336,7 @@
                 product.cantidad = 1
                 carrito.push(product)
             }
+            localStorage.setItem("carrito" , JSON.stringify(carrito))
             console.log(carrito)
             mostrarCarrito();
         }
@@ -354,35 +362,41 @@
                 buyBtn.disabled = true;
                 totalItems.textContent = '0';
                 badge.textContent = '0';
+                document.getElementById('total-price').textContent = '$0';
             } else {
                 let items = carrito.map(item => `
-                    <div class="carrito-item">
-                        <div class="item-info">
-                            <p class="item-name">${item.name}</p>
-                            <p class="item-cantidad">Cantidad: <strong>${item.cantidad}</strong></p>
-                        </div>
-                        <button class="btn-remove" onclick="eliminarDelCarrito(${item.id})">Eliminar</button>
+                <div class="carrito-item">
+                    <div class="item-info">
+                        <p class="item-name">${item.name}</p>
+                        <p class="item-cantidad">Cantidad: <strong>${item.cantidad}</strong></p>
+                        <p class="item-cantidad">Precio: $${item.price}</p>
+                        <p class="item-cantidad">Total: <strong>$${item.price * item.cantidad}</strong></p>
                     </div>
-                `).join('');
+                <button class="btn-remove" onclick="eliminarDelCarrito(${item.id})">Eliminar</button>
+                </div>
+            `).join('');
 
                 divcarrito.innerHTML = items;
                 buyBtn.disabled = false;
                 
                 let totalDatos = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+                let totalPrecio = carrito.reduce((sum, item) => sum + (item.price * item.cantidad), 0);
+                document.getElementById('total-price').textContent = '$' + totalPrecio;
                 totalItems.textContent = totalDatos;
                 badge.textContent = totalDatos;
             }
         }
 
-        function finalizarCompra() {
+       function finalizarCompra() {
             if(carrito.length === 0) {
-                alert('Tu carrito está vacío');
-                return;
-            }
-            alert('¡Compra realizada! Productos en carrito: ' + carrito.length);
-            // Aquí puedes enviar los datos del carrito al servidor
-            console.log('Carrito final:', carrito);
-        }
+            alert('Tu carrito está vacío');
+            return;
+       }
+            alert('¡Compra realizada! Total productos: ' + carrito.reduce((sum, item) => sum + item.cantidad, 0));
+            carrito = []; 
+            localStorage.removeItem('carrito'); 
+            mostrarCarrito(); 
+}
     </script>
 </body>
 </html>    
