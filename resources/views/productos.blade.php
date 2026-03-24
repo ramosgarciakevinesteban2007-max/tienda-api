@@ -313,9 +313,9 @@
                             <span>Total a pagar:</span>
                             <span id="total-price">$0</span>
                         </div>
-                        <button class="btn-checkout" id="btn-comprar" onclick="finalizarCompra()" disabled>
-                            Finalizar Compra
-                        </button>
+                        <div id="checkout-link">
+                            <a href="/checkout" class="btn btn-primary">Continuar Compra</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -384,6 +384,7 @@
                 document.getElementById('total-price').textContent = '$' + totalPrecio;
                 totalItems.textContent = totalDatos;
                 badge.textContent = totalDatos;
+                
             }
         }
 
